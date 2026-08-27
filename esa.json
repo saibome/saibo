@@ -1,0 +1,9 @@
+{
+  "framework": "astro",
+  "installCommand": "corepack enable && pnpm install",
+  "buildCommand": "corepack enable && pnpm run build",
+  "assets": {
+    "directory": "dist"
+  },
+  "functions": []
+}
