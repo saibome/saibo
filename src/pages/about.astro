@@ -31,17 +31,22 @@ import starFillIcon from '@phosphor-icons/core/assets/fill/star-fill.svg?raw';
 
 const GITHUB_USER = siteConfig.githubUser;
 
+// projectOverrides 的值在 site.config.json 里只声明了 icon，但代码里也
+// 可能引用 article，所以用一个宽松的本地类型做断言，避免 TS strict 报错。
+type ProjectOverride = { icon?: string; article?: string };
+const overrides = siteConfig.projectOverrides as unknown as Record<string, ProjectOverride>;
+
 // 项目名 → 博客文章链接（site.config.json 的 projectOverrides.article）；
 // 没有对应文章的项目不显示「笔记」按钮。
 const articleByRepo: Record<string, string> = Object.fromEntries(
-  Object.entries(siteConfig.projectOverrides)
-    .filter(([, v]) => v.article)
+  Object.entries(overrides)
+    .filter(([, v]) => Boolean(v.article))
     .map(([name, v]) => [name, v.article as string]),
 );
 
 // 项目名 → 卡片图标（site.config.json 的 projectOverrides.icon，默认 github 标记）
 const iconByRepo: Record<string, string> = Object.fromEntries(
-  Object.entries(siteConfig.projectOverrides)
+  Object.entries(overrides)
     .filter(([, v]) => v.icon)
     .map(([name, v]) => [name, v.icon as string]),
 );
@@ -105,19 +110,11 @@ const projectGroups = [
 
 <BaseLayout
   title="关于"
-  description="关于段枫，以及这个完全由 AI 开发的博客会持续记录的内容。"
+  description="关于赛博，以及这个完全由 AI 开发的博客会持续记录的内容。"
   pageClass="content-page"
 >
   <article class="about">
     <header class="about__intro">
-      <img
-        src="/avatars/avatar.png"
-        alt="段枫头像"
-        class="about__avatar"
-        width="72"
-        height="72"
-      />
-      <p class="eyebrow">About</p>
       <h1 class="about__lead">
         比起追新，我更在意一个工具<em>到底好不好用</em>。
       </h1>
@@ -135,7 +132,7 @@ const projectGroups = [
         <span class="about__social" aria-label="找到我">
           <a
             class="icon-button"
-            href="https://space.bilibili.com/46377861"
+            href="https://space.bilibili.com/17396009"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Bilibili"
@@ -144,7 +141,7 @@ const projectGroups = [
           </a>
           <a
             class="icon-button"
-            href="https://www.youtube.com/channel/UCUuwwXFGK8Z3OBrq6PzkmUg"
+            href="https://www.youtube.com"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="YouTube"
@@ -153,7 +150,7 @@ const projectGroups = [
           </a>
           <a
             class="icon-button"
-            href="https://x.com/shenfanlaogou"
+            href="https://x.com/saiboai"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="X"

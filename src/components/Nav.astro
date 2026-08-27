@@ -1,6 +1,5 @@
 ---
 import Icon from './Icon.astro';
-import siteConfig from '../data/site.config.json';
 
 // Trailing slashes matter: hosts 301 `/archive` → `/archive/`, and a redirect
 // makes the browser skip the cross-document view transition.
@@ -23,20 +22,7 @@ const isCurrent = (href: string) =>
     <a href="/archive/" class:list={[isCurrent('/archive/') && 'is-current']} data-nav-route>归档</a>
     <a href="/about/" class:list={[isCurrent('/about/') && 'is-current']} data-nav-route>关于</a>
     <span class="site-nav__sep" aria-hidden="true"></span>
-    {siteConfig.githubRepo && (
-      <a
-        href={siteConfig.githubRepo}
-        class="site-nav__icon"
-        aria-label="GitHub 仓库"
-        title="GitHub 仓库"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Icon name="github" size={18} />
-      </a>
-    )}
-    <a
-      href="/search/"
+    <a href="/search/"
       class:list={['site-nav__icon', isCurrent('/search/') && 'is-current']}
       aria-label="搜索"
       aria-keyshortcuts="/ Meta+K"

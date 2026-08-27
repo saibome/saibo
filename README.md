@@ -60,7 +60,7 @@ npm run preview
 ## 部署
 
 1. 连接仓库（Vercel / Netlify / Cloudflare Pages / GitHub Pages 均可），构建命令 `npm run build`，输出目录 `dist`
-2. 在平台环境变量中设置 `SITE_URL` 为正式域名
+2. 在平台环境变量中设置 `PUBLIC_SITE_URL` 为正式域名
 3. 自定义域名按平台指引添加 DNS 解析（CNAME 记录）
 4. 若旧域名需要迁移，在平台侧配置 301 重定向
 
@@ -71,22 +71,12 @@ npm run preview
 复制 `.env.example` 为 `.env`，按需填写：
 
 ```bash
-SITE_URL=https://example.com
+PUBLIC_SITE_URL=https://saibo.me
 PUBLIC_TWIKOO_ENV_ID=https://your-twikoo.example.com
-PUBLIC_NETEASE_PLAYLIST_ID=8792942606
-PUBLIC_MUSIC_API=https://meting.mikus.ink/api
 ```
 
-- `SITE_URL`：站点正式域名，用于 RSS、sitemap、canonical URL 和结构化数据。
+- `PUBLIC_SITE_URL`：站点正式域名，用于 RSS、sitemap、canonical URL 和结构化数据。
 - `PUBLIC_TWIKOO_ENV_ID`：Twikoo 后端地址。未配置时，评论区和选中文字引用评论功能会自动隐藏。
-- `PUBLIC_NETEASE_PLAYLIST_ID`：网易云音乐歌单 ID。未配置时使用博主歌单 `8792942606`。
-- `PUBLIC_MUSIC_API`：Meting 兼容的音乐 API 地址，默认使用 `https://meting.mikus.ink/api`，也可换成自建服务。
-
-## 音乐播放器
-
-全站右下角的悬浮播放器会在浏览器中按需读取网易云歌单，不会自动播放。替换歌单时，从网易云歌单链接中复制 `id` 数字，写入 `.env` 的 `PUBLIC_NETEASE_PLAYLIST_ID` 后重新启动开发服务。
-
-Meting 是非官方接入方式，受网易云版权、VIP 与地区限制影响，个别歌曲可能无法播放。生产环境若需要更稳定，建议将 `PUBLIC_MUSIC_API` 指向自建的 Meting 兼容服务。
 
 ## 内容
 
@@ -107,9 +97,8 @@ Meting 是非官方接入方式，受网易云版权、VIP 与地区限制影响
 | 站点名称 / 简介 / 作者 | [src/data/site.config.json](src/data/site.config.json) 的 `siteName` / `siteDescription` / `siteAuthor` |
 | 头像 | 替换 `public/avatars/avatar.png` 与 `avatar-bw.png` |
 | GitHub 用户名与仓库链接 | [src/data/site.config.json](src/data/site.config.json) 的 `githubUser` / `githubRepo`（不想要导航栏的 GitHub 按钮，把 `githubRepo` 留空即可） |
-| 正式域名 | 复制 `.env.example` 为 `.env`，设置 `SITE_URL` |
+| 正式域名 | 复制 `.env.example` 为 `.env`，设置 `PUBLIC_SITE_URL` |
 | 评论后端 | `.env` 的 `PUBLIC_TWIKOO_ENV_ID`（不配则评论自动隐藏） |
-| 音乐播放器歌单 | `.env` 的 `PUBLIC_NETEASE_PLAYLIST_ID` |
 | 文章与随笔 | 删除 `src/content/posts/` 下的 `示例/`、`AI/`、`技术/` 目录和 `src/content/notes/` 下的示例随笔，换成自己的 Markdown |
 
 改完 `site.config.json` 后重新 `npm run dev` 即可生效。

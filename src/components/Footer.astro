@@ -5,13 +5,10 @@ import { site } from '../lib/posts';
 const year = new Date().getFullYear();
 
 const channels = [
-  { name: 'Bilibili', icon: 'bilibili', href: 'https://space.bilibili.com/46377861' },
-  { name: 'YouTube', icon: 'youtube', href: 'https://www.youtube.com/channel/UCUuwwXFGK8Z3OBrq6PzkmUg' },
   { name: 'RSS', icon: 'rss', href: '/rss.xml' },
 ];
 
 const groups = [
-  { name: 'QQ 交流群', icon: 'qq', href: '' },
   { name: '微信交流群', icon: 'wechat', href: '' },
 ];
 ---
@@ -69,6 +66,6 @@ const groups = [
     <span aria-hidden="true">·</span>
     <a href={site.url}>{site.url.replace('https://', '')}</a>
     <span aria-hidden="true">·</span>
-    <span>由 <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a> 构建</span>
+    <span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer nofollow">粤ICP备2026121562号-2</a></span>
   </div>
 </footer>

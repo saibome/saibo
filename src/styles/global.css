@@ -13,8 +13,8 @@
   --accent-strong: #000000;
   --accent-soft: #efece4;
   --accent-line: rgba(27, 28, 30, 0.22);
-  --brand: #b0532b;
-  --brand-soft: rgba(176, 83, 43, 0.12);
+  --brand: #003dc2;
+  --brand-soft: rgba(0, 61, 194, 0.12);
   --shadow-sm: 0 1px 2px rgba(20, 24, 32, 0.05), 0 1px 3px rgba(20, 24, 32, 0.05);
   --shadow: 0 6px 18px rgba(20, 24, 32, 0.07), 0 2px 6px rgba(20, 24, 32, 0.04);
   --shadow-lg: 0 22px 48px rgba(20, 24, 32, 0.13), 0 8px 18px rgba(20, 24, 32, 0.06);
@@ -23,15 +23,15 @@
   --focus-ring: rgba(27, 28, 30, 0.32);
   --code-bg: #16181d;
   --code-text: #f5f7fb;
-  --inline-code: #a8482a;
+  --inline-code: #003dc2;
   --button-text-on-accent: #ffffff;
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 22px;
   --page-glow: radial-gradient(
     62% 100% at 50% -8%,
-    rgba(204, 116, 66, 0.16),
-    rgba(204, 116, 66, 0) 62%
+    rgba(0, 61, 194, 0.16),
+    rgba(0, 61, 194, 0) 62%
   );
   /* Liquid-glass material (nav pill, floating controls) */
   --glass-tint: rgba(255, 255, 255, 0.5);
@@ -78,8 +78,8 @@ html[data-theme="dark"] {
   --accent-strong: #ffffff;
   --accent-soft: #1e242d;
   --accent-line: rgba(240, 242, 246, 0.26);
-  --brand: #e7a37c;
-  --brand-soft: rgba(231, 163, 124, 0.16);
+  --brand: #40a9ff;
+  --brand-soft: rgba(64, 169, 255, 0.16);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.5);
@@ -88,12 +88,12 @@ html[data-theme="dark"] {
   --focus-ring: rgba(240, 242, 246, 0.4);
   --code-bg: #0a0e13;
   --code-text: #f3f7fb;
-  --inline-code: #f0a98a;
+  --inline-code: #7cc4ff;
   --button-text-on-accent: #0a1322;
   --page-glow: radial-gradient(
     62% 100% at 50% -8%,
-    rgba(231, 163, 124, 0.12),
-    rgba(231, 163, 124, 0) 62%
+    rgba(64, 169, 255, 0.12),
+    rgba(64, 169, 255, 0) 62%
   );
   --glass-tint: rgba(19, 25, 33, 0.5);
   --glass-sheen: linear-gradient(
@@ -3325,13 +3325,6 @@ p {
   }
 }
 
-/* Persist playback and navigation state without creating isolated snapshots
-   for translucent/backdrop-filter elements. The root snapshot is disabled; the
-   only animated snapshot is #main (page-content). */
-.music-player {
-  view-transition-name: none !important;
-}
-
 /* Theme switch: the new theme sweeps out of the toggle as an expanding circle.
    BaseLayout injects exact literal percentages for the button center and cover
    radius. Relative coordinates survive high-DPI view-transition rasterization
@@ -3371,7 +3364,7 @@ html.theme-vt *::after {
 /* The route router normally isolates these persistent elements into their own
    snapshots. A theme reveal needs one coherent canvas, so fold them back into
    the root snapshot only for this transition. */
-html.theme-vt :is(main, .site-nav, .site-nav__pill, .music-player) {
+html.theme-vt :is(main, .site-nav, .site-nav__pill) {
   view-transition-name: none !important;
 }
 

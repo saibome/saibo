@@ -6,7 +6,8 @@ export type BlogPost = CollectionEntry<'posts'>;
 export const site = {
   name: siteConfig.siteName,
   description: siteConfig.siteDescription,
-  url: import.meta.env.SITE_URL ?? 'https://example.com',
+  // 带 PUBLIC_ 前缀的环境变量才会暴露给 import.meta.env（.env 文件与平台注入均生效）。
+  url: import.meta.env.PUBLIC_SITE_URL ?? 'https://saibo.me',
   author: siteConfig.siteAuthor,
 };
 
