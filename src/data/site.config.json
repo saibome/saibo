@@ -2,8 +2,8 @@
   "siteName": "赛博的博客",
   "siteDescription": "记录 AI、代码、网站搭建和技术观察。",
   "siteAuthor": "赛博",
-  "githubUser": "laogou717",
-  "githubRepo": "https://github.com/laogou717/clay-blog",
+  "githubUser": "saibome",
+  "githubRepo": "https://github.com/saibome/saibo",
   "projectOverrides": {
     "md-wechat": {
       "icon": "wechat"
