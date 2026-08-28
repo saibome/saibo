@@ -158,7 +158,7 @@ ok "同步完成"
 REMOTE_INDEX=$($SSH_CMD "$REMOTE_HOST" "cat '$REMOTE_DIR/index.html' 2>/dev/null | head -c 200" || true)
 if [ -n "$REMOTE_INDEX" ]; then
   ok "远端 index.html 校验正常"
-  info "现在访问 http://47.106.112.100 看看效果吧"
+  info "现在访问 https://saibo.me 看看效果吧"
 else
   warn "远端 index.html 读取为空，建议登录 1Panel 检查站点目录权限"
 fi
