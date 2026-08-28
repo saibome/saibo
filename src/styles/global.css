@@ -533,14 +533,6 @@ p {
   line-height: 1.65;
 }
 
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem 1.1rem;
-  margin-top: 1.6rem;
-}
-
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -550,28 +542,6 @@ p {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-/* Text links (not buttons) */
-.text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text);
-  font-weight: 650;
-  font-size: 0.98rem;
-}
-
-.text-link svg {
-  transition: transform var(--t-fast) var(--ease-out);
-}
-
-.text-link:hover {
-  color: var(--brand);
-}
-
-.text-link:hover svg {
-  transform: translateX(3px);
 }
 
 /* "查看全部" link under a section list */
@@ -596,16 +566,6 @@ p {
 
 .section__more:hover svg {
   transform: translateX(3px);
-}
-
-/* Icon social buttons */
-.hero__social {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-left: 0.4rem;
-  padding-left: 0.95rem;
-  border-left: 1px solid var(--border);
 }
 
 .icon-button {
@@ -1001,7 +961,6 @@ p {
 }
 
 /* ---------- Taxonomy (open, borderless) ---------- */
-.taxonomy-overview,
 .archive-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1366,23 +1325,6 @@ p {
 .about__intro {
   max-width: 52rem;
   margin-bottom: 3.75rem;
-}
-
-.about__avatar {
-  width: 3.6rem;
-  height: 3.6rem;
-  margin-bottom: 1.2rem;
-  border: 3px solid var(--surface);
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 0 0 1px var(--border), var(--shadow);
-  transition: rotate var(--t-base) var(--ease-spring),
-    scale var(--t-base) var(--ease-spring);
-}
-
-.about__avatar:hover {
-  rotate: -4deg;
-  scale: 1.06;
 }
 
 .about__intro .eyebrow {
@@ -1856,17 +1798,8 @@ p {
   border-radius: var(--radius-sm);
 }
 
-.post-content img:not(.legacy-inline-image) {
+.post-content img {
   cursor: zoom-in;
-}
-
-.post-content .legacy-inline-image {
-  display: inline-block;
-  max-height: 2.4em;
-  margin: 0 0.15em;
-  vertical-align: middle;
-  border-radius: 4px;
-  cursor: auto;
 }
 
 /* ---------- Reading progress + back to top ---------- */
@@ -2271,70 +2204,6 @@ p {
   overflow: hidden;
 }
 
-/* ---------- Legacy shortcode blocks ---------- */
-.legacy-folding {
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-}
-
-.legacy-folding summary {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.legacy-secret {
-  border-style: dashed;
-}
-
-.legacy-link-card,
-.legacy-site-card {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1.2rem 0;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text);
-  text-decoration: none;
-  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
-}
-
-.legacy-link-card:hover,
-.legacy-site-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-sm);
-}
-
-.legacy-site-card {
-  grid-template-columns: 5.4rem minmax(0, 1fr);
-  align-items: center;
-}
-
-.legacy-site-card img {
-  width: 5.4rem;
-  aspect-ratio: 16 / 10;
-  margin: 0;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.legacy-link-card span,
-.legacy-site-card strong {
-  display: block;
-  font-weight: 700;
-}
-
-.legacy-link-card small,
-.legacy-site-card small {
-  display: block;
-  margin-top: 0.2rem;
-  color: var(--text-muted);
-  font-size: 0.86rem;
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
   main {
@@ -2384,7 +2253,6 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .taxonomy-overview,
   .archive-summary {
     grid-template-columns: 1fr;
   }
@@ -2449,20 +2317,6 @@ p {
 
   .post-row__cat {
     display: none;
-  }
-
-  .legacy-site-card {
-    grid-template-columns: 1fr;
-  }
-
-  .legacy-site-card img {
-    width: 100%;
-  }
-
-  .hero__social {
-    margin-left: 0;
-    padding-left: 0;
-    border-left: 0;
   }
 
   .toc {
@@ -3270,7 +3124,7 @@ p {
 
 /* Article images develop in as the bytes arrive */
 @media (prefers-reduced-motion: no-preference) {
-  .js .post-content img:not(.legacy-inline-image) {
+  .js .post-content img {
     opacity: 0.001;
     scale: 0.992;
     transition: opacity 0.6s var(--ease-out), scale 0.8s var(--ease-out-soft);

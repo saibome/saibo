@@ -459,9 +459,7 @@ const routeMotion = {
 
       (() => {
         const signal = window.__blogPageController.signal;
-        const images = document.querySelectorAll(
-          '.post-content img:not(.legacy-inline-image)',
-        );
+        const images = document.querySelectorAll('.post-content img');
 
         if (!images.length) {
           return;

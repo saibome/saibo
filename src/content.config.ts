@@ -27,7 +27,6 @@ const posts = defineCollection({
       keywords: stringList,
       ai: stringList,
       sticky: z.coerce.number().optional(),
-      main_color: z.string().optional(),
       author: z.string().optional(),
     })
     .passthrough(),
