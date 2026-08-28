@@ -16,6 +16,8 @@ REMOTE_HOST="${DEPLOY_HOST:-root@47.106.112.100}"                               
 REMOTE_PORT="${DEPLOY_PORT:-22}"
 REMOTE_DIR="${DEPLOY_DIR:-/opt/1panel/www/sites/saibo/index}"
 SSH_KEY="${DEPLOY_KEY:-}"                                                        # 留空则使用默认密钥/免密配置
+SITE_URL="${DEPLOY_SITE_URL:-https://saibo.me}"                                  # 部署后健康检查地址
+BACKUP_KEEP="${DEPLOY_BACKUP_KEEP:-5}"                                           # 远端备份保留份数
 # ====================================================================
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -69,6 +71,15 @@ title "Step 1/4  配置检查"
 if [[ "$REMOTE_HOST" == *"你的服务器IP"* ]]; then
   err "还没配置服务器地址。请编辑 deploy.sh 顶部的配置区，把 REMOTE_HOST / REMOTE_DIR 改成你的实际值。"
   exit 1
+fi
+command -v pnpm >/dev/null 2>&1 || {
+  err "pnpm 未安装，无法构建。请先执行: corepack enable"
+  exit 1
+}
+# git 工作区有未提交改动时提醒（保证部署内容与仓库一致）
+if git -C "$PROJECT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+  DIRTY_COUNT=$(git -C "$PROJECT_DIR" status --porcelain | wc -l | tr -d ' ')
+  [ "$DIRTY_COUNT" -gt 0 ] && warn "工作区有 $DIRTY_COUNT 项未提交改动，线上将包含这些未入库的内容"
 fi
 info "远端目标: ${REMOTE_HOST}:${REMOTE_DIR}"
 info "rsync:    $RSYNC_BIN $("$RSYNC_BIN" --version 2>&1 | head -1)"
@@ -136,10 +147,19 @@ if [ "$CHANGED" -eq 0 ] && [ "$DELETED" -eq 0 ]; then
   exit 0
 fi
 
+# 同步前备份远端当前站点（防 --delete 误删，保留最近 BACKUP_KEEP 份）
+SITE_NAME=$(basename "$(dirname "$REMOTE_DIR")")
+BACKUP_DIR="$(dirname "$REMOTE_DIR")/backups"
+STAMP=$(date +%Y%m%d-%H%M%S)
+info "备份远端站点到 $BACKUP_DIR/$SITE_NAME-$STAMP.tar.gz"
+$SSH_CMD "$REMOTE_HOST" "mkdir -p '$BACKUP_DIR' && tar czf '$BACKUP_DIR/$SITE_NAME-$STAMP.tar.gz' -C '$(dirname "$REMOTE_DIR")' '$(basename "$REMOTE_DIR")' \
+  && ls -1t '$BACKUP_DIR'/ | tail -n +$((BACKUP_KEEP + 1)) | while read -r f; do rm -f '$BACKUP_DIR/'\"$f\"; done" \
+  && ok "备份完成（保留最近 $BACKUP_KEEP 份）" || warn "备份失败，继续同步（可检查远端磁盘/权限）"
+
 if [ "$ASSUME_YES" -ne 1 ]; then
   # --delete 会删除服务器上多余的文件，删除超过 5 项时重点警告
   if [ "$DELETED" -gt 5 ]; then
-    warn "本次将删除 $DELETED 项文件。如果这是首次部署，建议先备份服务器上的旧站点。"
+    warn "本次将删除 $DELETED 项文件。旧站点已自动备份，如需回滚可从远端 backups/ 目录恢复。"
   fi
   printf '%s确认同步？[y/N] %s' "$C_BOLD" "$C_RESET"
   read -r reply
@@ -154,11 +174,14 @@ fi
 
 ok "同步完成"
 
-# ---------- 收尾校验 ----------
-REMOTE_INDEX=$($SSH_CMD "$REMOTE_HOST" "cat '$REMOTE_DIR/index.html' 2>/dev/null | head -c 200" || true)
-if [ -n "$REMOTE_INDEX" ]; then
-  ok "远端 index.html 校验正常"
-  info "现在访问 https://saibo.me 看看效果吧"
+# ---------- 收尾健康检查 ----------
+HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 "$SITE_URL" 2>/dev/null || echo "000")
+if [ "$HTTP_CODE" = "200" ]; then
+  ok "健康检查通过: $SITE_URL 返回 200"
+  info "现在访问 $SITE_URL 看看效果吧"
 else
-  warn "远端 index.html 读取为空，建议登录 1Panel 检查站点目录权限"
+  warn "健康检查未通过（$SITE_URL 返回 $HTTP_CODE）。"
+  warn "同步本身已完成。可能是 nginx 配置/证书/DNS 问题，可登录 1Panel 检查，或稍后手动验证。"
+  REMOTE_INDEX=$($SSH_CMD "$REMOTE_HOST" "test -f '$REMOTE_DIR/index.html' && echo yes || echo no" 2>/dev/null || echo unknown)
+  [ "$REMOTE_INDEX" = "yes" ] && info "远端文件已就位（index.html 存在），问题应在线上服务层而非同步"
 fi
