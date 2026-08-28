@@ -12,9 +12,9 @@
 set -euo pipefail
 
 # ===================== 配置区（按你的服务器修改） =====================
-REMOTE_HOST="${DEPLOY_HOST:-root@你的服务器IP}"                                  # 例: root@47.98.xxx.xxx
+REMOTE_HOST="${DEPLOY_HOST:-root@47.106.112.100}"                                  # 例: root@47.98.xxx.xxx
 REMOTE_PORT="${DEPLOY_PORT:-22}"
-REMOTE_DIR="${DEPLOY_DIR:-/opt/1panel/apps/openresty/openresty/www/sites/saibo.me/index}"
+REMOTE_DIR="${DEPLOY_DIR:-/opt/1panel/www/sites/saibo/index}"
 SSH_KEY="${DEPLOY_KEY:-}"                                                        # 留空则使用默认密钥/免密配置
 # ====================================================================
 
@@ -158,7 +158,7 @@ ok "同步完成"
 REMOTE_INDEX=$($SSH_CMD "$REMOTE_HOST" "cat '$REMOTE_DIR/index.html' 2>/dev/null | head -c 200" || true)
 if [ -n "$REMOTE_INDEX" ]; then
   ok "远端 index.html 校验正常"
-  info "现在访问 https://saibo.me 看看效果吧"
+  info "现在访问 http://47.106.112.100 看看效果吧"
 else
   warn "远端 index.html 读取为空，建议登录 1Panel 检查站点目录权限"
 fi
