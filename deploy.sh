@@ -17,7 +17,6 @@ REMOTE_PORT="${DEPLOY_PORT:-22}"
 REMOTE_DIR="${DEPLOY_DIR:-/opt/1panel/www/sites/saibo/index}"
 SSH_KEY="${DEPLOY_KEY:-}"                                                        # 留空则使用默认密钥/免密配置
 SITE_URL="${DEPLOY_SITE_URL:-https://saibo.me}"                                  # 部署后健康检查地址
-BACKUP_KEEP="${DEPLOY_BACKUP_KEEP:-5}"                                           # 远端备份保留份数
 # ====================================================================
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -71,15 +70,6 @@ title "Step 1/4  配置检查"
 if [[ "$REMOTE_HOST" == *"你的服务器IP"* ]]; then
   err "还没配置服务器地址。请编辑 deploy.sh 顶部的配置区，把 REMOTE_HOST / REMOTE_DIR 改成你的实际值。"
   exit 1
-fi
-command -v pnpm >/dev/null 2>&1 || {
-  err "pnpm 未安装，无法构建。请先执行: corepack enable"
-  exit 1
-}
-# git 工作区有未提交改动时提醒（保证部署内容与仓库一致）
-if git -C "$PROJECT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
-  DIRTY_COUNT=$(git -C "$PROJECT_DIR" status --porcelain | wc -l | tr -d ' ')
-  [ "$DIRTY_COUNT" -gt 0 ] && warn "工作区有 $DIRTY_COUNT 项未提交改动，线上将包含这些未入库的内容"
 fi
 info "远端目标: ${REMOTE_HOST}:${REMOTE_DIR}"
 info "rsync:    $RSYNC_BIN $("$RSYNC_BIN" --version 2>&1 | head -1)"
@@ -147,19 +137,10 @@ if [ "$CHANGED" -eq 0 ] && [ "$DELETED" -eq 0 ]; then
   exit 0
 fi
 
-# 同步前备份远端当前站点（防 --delete 误删，保留最近 BACKUP_KEEP 份）
-SITE_NAME=$(basename "$(dirname "$REMOTE_DIR")")
-BACKUP_DIR="$(dirname "$REMOTE_DIR")/backups"
-STAMP=$(date +%Y%m%d-%H%M%S)
-info "备份远端站点到 $BACKUP_DIR/$SITE_NAME-$STAMP.tar.gz"
-$SSH_CMD "$REMOTE_HOST" "mkdir -p '$BACKUP_DIR' && tar czf '$BACKUP_DIR/$SITE_NAME-$STAMP.tar.gz' -C '$(dirname "$REMOTE_DIR")' '$(basename "$REMOTE_DIR")' \
-  && ls -1t '$BACKUP_DIR'/ | tail -n +$((BACKUP_KEEP + 1)) | while read -r f; do rm -f '$BACKUP_DIR/'\"$f\"; done" \
-  && ok "备份完成（保留最近 $BACKUP_KEEP 份）" || warn "备份失败，继续同步（可检查远端磁盘/权限）"
-
 if [ "$ASSUME_YES" -ne 1 ]; then
   # --delete 会删除服务器上多余的文件，删除超过 5 项时重点警告
   if [ "$DELETED" -gt 5 ]; then
-    warn "本次将删除 $DELETED 项文件。旧站点已自动备份，如需回滚可从远端 backups/ 目录恢复。"
+    warn "本次将删除 $DELETED 项文件。"
   fi
   printf '%s确认同步？[y/N] %s' "$C_BOLD" "$C_RESET"
   read -r reply
