@@ -97,7 +97,7 @@ const rel = (ts) => {
   return new Date(ts).toLocaleDateString('zh-CN');
 };
 
-export function callTwikoo(envId, event, params = {}) {
+function callTwikoo(envId, event, params = {}) {
   return fetch(envId, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -105,7 +105,7 @@ export function callTwikoo(envId, event, params = {}) {
   }).then((r) => r.json());
 }
 
-export const itemHTML = (c, { reply = false, actions = true } = {}) => {
+const itemHTML = (c, { reply = false, actions = true } = {}) => {
   const replies = (c.replies || []).map((r) => itemHTML(r, { reply: true, actions })).join('');
   const id = esc(c.id);
   return `<li class="citem${reply ? ' citem--reply' : ''}" data-id="${id}">
@@ -216,6 +216,7 @@ export function mountComments(root, { envId, url, onCount } = {}) {
       if (onCount) onCount(total);
     } catch {
       moreEl.hidden = true;
+      setStatus('评论加载失败，请刷新重试。', false);
     }
     loading = false;
   };

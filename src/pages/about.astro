@@ -14,7 +14,7 @@ const firstYear = posts.reduce((min, post) => {
 // ---- 开源项目：构建时从 GitHub API 自动同步 ----
 // 优先请求实时数据（5 秒超时）；API 不可达时回退到本地缓存
 // src/data/github-projects.json（用以下命令刷新缓存：
-// curl -s "https://api.github.com/users/laogou717/repos?per_page=100" -o src/data/github-projects.json）
+// curl -s "https://api.github.com/users/saibome/repos?per_page=100" -o src/data/github-projects.json）
 interface GhRepo {
   name: string;
   description: string | null;
@@ -59,7 +59,7 @@ const fetchGithubRepos = async (): Promise<GhRepo[]> => {
       `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed&type=source`,
       {
         headers: {
-          'User-Agent': 'laogou717-blog/astro',
+          'User-Agent': 'saibo-blog/astro',
           Accept: 'application/vnd.github+json',
         },
         signal: controller.signal,
@@ -130,24 +130,6 @@ const projectGroups = [
         <span class="about__fact">写于 {firstYear} 至今</span>
         <span class="about__fact">全站由 AI 开发</span>
         <span class="about__social" aria-label="找到我">
-          <a
-            class="icon-button"
-            href="https://space.bilibili.com/17396009"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Bilibili"
-          >
-            <Icon name="bilibili" />
-          </a>
-          <a
-            class="icon-button"
-            href="https://www.youtube.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="YouTube"
-          >
-            <Icon name="youtube" />
-          </a>
           <a
             class="icon-button"
             href="https://x.com/saiboai"
