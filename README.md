@@ -1,6 +1,6 @@
 # saibo
 
-基于 Astro 的个人博客，内容使用 Markdown 管理，包含文章、随笔、归档、分类、标签、搜索、RSS、站点地图和 Twikoo 后端评论。使用 Node.js 作为运行时，pnpm 作为包管理器（`package.json` 已声明 `packageManager: pnpm@11.10.0`）。
+基于 Astro 的个人博客，内容使用 Markdown 管理，包含文章、随笔、归档、分类、标签、搜索、RSS、站点地图和 Twikoo 后端评论。使用 Bun 作为运行时与包管理器。
 
 ## 项目结构
 
@@ -22,34 +22,29 @@ saibo/
 │   ├── lib/               # 工具函数与 Markdown 插件
 │   └── styles/            # 全局样式（主题色变量在此定义）
 ├── astro.config.mjs       # Astro 配置
-├── pnpm-lock.yaml         # pnpm 依赖锁定文件
+├── bun.lock               # Bun 依赖锁定文件
 └── package.json
 ```
 
 ## 快速开始
 
-**环境要求：Node.js（>= 18.20 或 >= 20.3 或 >= 22）与 pnpm。** 不需要单独安装 Astro——Astro 是项目依赖，`pnpm install` 时会自动装好。
-
-> 推荐用 Node.js 自带的 **Corepack** 启用 pnpm（无需全局安装 pnpm）：`corepack enable` 会让 `pnpm` 命令可用，并自动对齐 `package.json` 里声明的版本。
+**环境要求：[Bun](https://bun.sh)（>= 1.2）。** 不需要单独安装 Astro——Astro 是项目依赖，`bun install` 时会自动装好。
 
 第一次使用，按顺序执行：
 
 ```bash
-# 1. 安装 Node.js（未安装时）：到 https://nodejs.org/ 下载 LTS 版本安装
-#    Node 自带 npm 与 Corepack
+# 1. 安装 Bun（未安装时，只需执行一次）
+curl -fsSL https://bun.sh/install | bash
 
-# 2. 启用 pnpm（只需执行一次）
-corepack enable
-
-# 3. 下载项目
+# 2. 下载项目
 git clone https://github.com/saibome/saibo.git
 cd saibo
 
-# 4. 安装依赖（自动安装 Astro）
-pnpm install
+# 3. 安装依赖（自动安装 Astro）
+bun install
 
-# 5. 启动本地预览
-pnpm run dev
+# 4. 启动本地预览
+bun run dev
 ```
 
 浏览器打开 `http://localhost:4321` 即可看到博客。修改 `src/content/` 下的 Markdown 后保存，页面会热更新。
@@ -57,16 +52,16 @@ pnpm run dev
 ## 构建
 
 ```bash
-pnpm run build
-pnpm run preview
+bun run build
+bun run preview
 ```
 
 构建产物输出到 `dist/`，可部署到任意静态托管平台。
 
 ## 部署
 
-1. 连接仓库（Vercel / Netlify / Cloudflare Pages / GitHub Pages 均可），构建命令 `pnpm install && pnpm run build`，输出目录 `dist`
-   - 若托管平台默认支持 pnpm，通常可简写为 `pnpm run build`；不支持时可先启用 Corepack（见「常见问题」）
+1. 连接仓库（Vercel / Netlify / Cloudflare Pages / GitHub Pages 均可），构建命令 `bun install && bun run build`，输出目录 `dist`
+   - 若托管平台默认支持 Bun，通常可简写为 `bun run build`
 2. 在平台环境变量中设置 `PUBLIC_SITE_URL` 为正式域名
 3. 自定义域名按平台指引添加 DNS 解析（CNAME 记录）
 4. 若旧域名需要迁移，在平台侧配置 301 重定向
@@ -112,7 +107,7 @@ PUBLIC_TWIKOO_ENV_ID=https://your-twikoo.example.com
 | 页脚备案号 | [src/components/Footer.astro](src/components/Footer.astro) 的备案链接 |
 | 文章与随笔 | 删除 `src/content/posts/` 下的 `示例/`、`AI/`、`技术/` 目录和 `src/content/notes/` 下的示例随笔，换成自己的 Markdown |
 
-改完 `site.config.json` 后重新 `pnpm run dev` 即可生效。
+改完 `site.config.json` 后重新 `bun run dev` 即可生效。
 
 ## 关于页配置
 
@@ -169,27 +164,24 @@ curl -s "https://api.github.com/users/saibome/repos?per_page=100" -o src/data/gi
 
 ## 常见问题
 
-**怎么启用 pnpm？**
-Node.js >= 16.17 自带 Corepack，运行 `corepack enable` 即可（会读取 `package.json` 的 `packageManager` 字段并自动用对应版本的 pnpm）。也可以全局安装：`npm install -g pnpm`。
+**怎么安装 Bun？**
+macOS / Linux 执行 `curl -fsSL https://bun.sh/install | bash`；Windows 用 `powershell -c "irm bun.sh/install.ps1 | iex"`。详见 [bun.sh](https://bun.sh/docs/installation)。
 
 **Astro 需要单独安装吗？**
-不需要。Astro 是 `package.json` 里的依赖，`pnpm install` 自动安装，无需全局安装任何东西。
+不需要。Astro 是 `package.json` 里的依赖，`bun install` 自动安装，无需全局安装任何东西。
 
-**`pnpm install` 很慢 / 失败？**
+**`bun install` 很慢 / 失败？**
 国内网络可切换到镜像源：
 
 ```bash
-pnpm config set registry https://registry.npmmirror.com
+bun config set registry https://registry.npmmirror.com
 ```
 
 **端口被占用？**
-`pnpm run dev -- --port 4322` 指定其他端口。
+`bun run dev -- --port 4322` 指定其他端口。
 
 **本地预览域名还是 example.com？**
-环境变量在 dev server 启动时读取，改完 `.env` 需重启 `pnpm run dev` 才会生效。
-
-**构建平台（Vercel/Netlify 等）报 `pnpm: command not found`？**
-在构建命令前加一步：`corepack enable`（或 `npm i -g pnpm`），例如完整构建命令：`corepack enable && pnpm install && pnpm run build`。
+环境变量在 dev server 启动时读取，改完 `.env` 需重启 `bun run dev` 才会生效。
 
 ## 许可证
 

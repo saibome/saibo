@@ -81,7 +81,7 @@ title "Step 2/4  本地构建"
 # ====================================================================
 cd "$PROJECT_DIR"
 rm -rf "$DIST_DIR"
-pnpm run build > /tmp/clay-blog-build.log 2>&1 || {
+bun run build > /tmp/clay-blog-build.log 2>&1 || {
   err "构建失败，日志见 /tmp/clay-blog-build.log："; tail -20 /tmp/clay-blog-build.log >&2; exit 1
 }
 ok "构建完成"

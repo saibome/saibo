@@ -1,6 +1,6 @@
 # clay-blog 部署到阿里云服务器（1Panel 面板）
 
-本项目是**纯静态 Astro 站点**（无 SSR、无服务端 adapter），`pnpm build` 后产物全部在 `dist/`，
+本项目是**纯静态 Astro 站点**（无 SSR、无服务端 adapter），`bun run build` 后产物全部在 `dist/`，
 所以部署 = `dist/` 放到服务器 + Nginx/OpenResty 托管 + 域名 HTTPS。
 
 实测数据：40 个页面、53 个文件、2.7MB，构建 3 秒，rsync 增量同步通常 1～2 秒。
@@ -217,11 +217,10 @@ gzip_types text/plain text/css application/json application/javascript
 | 项 | 值 |
 |----|-----|
 | 站点地址 | `https://saibo.me`（定义在 `astro.config.mjs` 的 `site` 字段） |
-| 构建命令 | `pnpm run build` |
+| 构建命令 | `bun run build` |
 | 产物目录 | `dist/` |
 | Git 仓库 | `github.com/saibome/saibo` |
-| Node 要求 | >= 18.20 / 20.3 / 22 |
-| 包管理器 | pnpm 11.10.0 |
+| 运行时 / 包管理器 | Bun（>= 1.2） |
 
 > `astro.config.mjs` 里的 `site` 支持环境变量 `PUBLIC_SITE_URL` 覆盖，
 > 本地 `.env` 已设为 `https://saibo.me`（`.env` 不进 Git，部署时以环境变量或默认值为准）。
