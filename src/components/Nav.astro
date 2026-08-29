@@ -228,6 +228,13 @@ const isCurrent = (href: string) =>
     };
     window.addEventListener('scroll', syncNavVisibility, { passive: true });
 
+    // 页面切换时滚动位置会重置：强制导航回到显示态并同步基准位置，
+    // 避免 swap 触发的 scroll 事件让底板在切换瞬间滑出又滑入（闪烁）。
+    document.addEventListener('astro:before-swap', () => {
+      lastY = 0;
+      navEl?.classList.remove('is-scroll-hidden');
+    });
+
     navMotion.initialized = true;
   }
 </script>

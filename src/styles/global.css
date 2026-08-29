@@ -2339,7 +2339,6 @@ p {
     inset: auto 0 calc(0.65rem + env(safe-area-inset-bottom, 0px));
     padding: 0 1rem;
     transition: transform 0.28s var(--ease-out-soft);
-    will-change: transform;
   }
 
   /* 下滑阅读时导航滑出屏幕，上滑或接近顶部时滑回（类由 Nav 脚本切换） */
