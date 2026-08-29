@@ -208,31 +208,41 @@ const isCurrent = (href: string) =>
     document.addEventListener('astro:after-swap', () => syncCurrentNavItem(true));
     window.addEventListener('resize', () => positionNavIndicator(false), { passive: true });
 
-    // Mobile: hide the bottom nav while scrolling down to read, reveal it
-    // when scrolling back up or nearing the top. CSS decides whether the
-    // hidden state actually applies (mobile breakpoint only).
+    // Mobile: the bottom nav only appears transiently — while the user is
+    // actively scrolling back up (content sliding down). Once scrolling stops
+    // it retracts, so it never lingers over the text. Nearing the top keeps
+    // it visible. CSS decides whether the hidden state applies (mobile only).
     const navEl = document.querySelector('.site-nav');
     let lastY = window.scrollY;
+    let idleTimer: ReturnType<typeof setTimeout> | undefined;
+    const hideNav = () => navEl?.classList.add('is-scroll-hidden');
+    const showNav = () => navEl?.classList.remove('is-scroll-hidden');
     const syncNavVisibility = () => {
       if (!navEl) return;
       const y = window.scrollY;
       const delta = y - lastY;
-      if (y < 80 || Math.abs(delta) < 8) {
-        navEl.classList.remove('is-scroll-hidden');
-      } else if (delta > 0) {
-        navEl.classList.add('is-scroll-hidden');
-      } else {
-        navEl.classList.remove('is-scroll-hidden');
+      if (y < 80) {
+        showNav();
+      } else if (delta > 8) {
+        hideNav();
+      } else if (delta < -8) {
+        showNav();
       }
       lastY = y;
+      // 滚动停止后自动收起（顶部区域除外）：导航只在手势期间短暂出现
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        if (window.scrollY >= 80) hideNav();
+      }, 600);
     };
     window.addEventListener('scroll', syncNavVisibility, { passive: true });
 
     // 页面切换时滚动位置会重置：强制导航回到显示态并同步基准位置，
     // 避免 swap 触发的 scroll 事件让底板在切换瞬间滑出又滑入（闪烁）。
     document.addEventListener('astro:before-swap', () => {
+      clearTimeout(idleTimer);
       lastY = 0;
-      navEl?.classList.remove('is-scroll-hidden');
+      showNav();
     });
 
     navMotion.initialized = true;
