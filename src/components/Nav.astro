@@ -207,6 +207,27 @@ const isCurrent = (href: string) =>
     });
     document.addEventListener('astro:after-swap', () => syncCurrentNavItem(true));
     window.addEventListener('resize', () => positionNavIndicator(false), { passive: true });
+
+    // Mobile: hide the bottom nav while scrolling down to read, reveal it
+    // when scrolling back up or nearing the top. CSS decides whether the
+    // hidden state actually applies (mobile breakpoint only).
+    const navEl = document.querySelector('.site-nav');
+    let lastY = window.scrollY;
+    const syncNavVisibility = () => {
+      if (!navEl) return;
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (y < 80 || Math.abs(delta) < 8) {
+        navEl.classList.remove('is-scroll-hidden');
+      } else if (delta > 0) {
+        navEl.classList.add('is-scroll-hidden');
+      } else {
+        navEl.classList.remove('is-scroll-hidden');
+      }
+      lastY = y;
+    };
+    window.addEventListener('scroll', syncNavVisibility, { passive: true });
+
     navMotion.initialized = true;
   }
 </script>

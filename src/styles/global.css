@@ -2334,8 +2334,34 @@ p {
 }
 
 @media (max-width: 460px) {
+  /* 手机端：导航悬浮在底部，与屏幕底边留出空隙（叠加 iPhone 安全区） */
+  .site-nav {
+    inset: auto 0 calc(0.65rem + env(safe-area-inset-bottom, 0px));
+    padding: 0 1rem;
+    transition: transform 0.28s var(--ease-out-soft);
+    will-change: transform;
+  }
+
+  /* 下滑阅读时导航滑出屏幕，上滑或接近顶部时滑回（类由 Nav 脚本切换） */
+  .site-nav.is-scroll-hidden {
+    transform: translateY(calc(100% + 1.5rem + env(safe-area-inset-bottom, 0px)));
+  }
+
+  /* 顶部导航不再占据上方空间，收紧顶部留白 */
+  main {
+    padding-top: 3.25rem;
+  }
+
+  .home-page main {
+    padding-top: 4.25rem;
+  }
+
+  /* 页脚底部留出导航的高度，避免滚动到最底时被导航遮挡 */
+  .site-footer {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .site-nav__pill {
-    width: 100%;
     justify-content: center;
     gap: 0;
   }
