@@ -28,9 +28,16 @@ const posts = defineCollection({
         description: z.string().optional(),
         date: z.coerce.date().optional(),
         updated: z.coerce.date().optional(),
-        // cover 支持本地图片（自动校验存在+构建时优化转WebP）和纯字符串外链
+        // cover 三种写法均支持（按顺序匹配，string 在前避免 image() 误解析路径）：
+        //  - 站内绝对路径：/covers/example.jpg（public/ 下的静态资源）
+        //  - 外链：https://cdn.example.com/xxx.jpg
+        //  - 本地相对路径（推荐）：./cover.jpg → Astro 自动校验存在+构建时优化
         cover: z
-          .union([image(), z.string().url()])
+          .union([
+            z.string().startsWith('/'),
+            z.string().url(),
+            image(),
+          ])
           .optional(),
         categories: stringList,
         tags: stringList,
