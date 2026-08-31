@@ -1,7 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 import siteConfig from '../data/site.config.json';
 
 export type BlogPost = CollectionEntry<'posts'>;
+export type PostCover = string | ImageMetadata;
 
 export const site = {
   name: siteConfig.siteName,
@@ -65,7 +67,15 @@ export const getPostCategory = (post: BlogPost) => post.data.categories?.[0];
 
 export const getPostTags = (post: BlogPost) => post.data.tags ?? [];
 
-export const getPostCover = (post: BlogPost) => post.data.cover;
+// cover 字段两种形态统一成渲染用的 URL 字符串：
+//  - 本地 image() 元数据 → .src
+//  - 纯字符串外链 / 绝对路径 → 原样返回
+//  - 缺失 → undefined
+export const getPostCover = (post: BlogPost): string | undefined => {
+  const c = post.data.cover;
+  if (!c) return undefined;
+  return typeof c === 'string' ? c : c.src;
+};
 
 export const getPostPath = (post: BlogPost) => `/posts/${post.id}/`;
 

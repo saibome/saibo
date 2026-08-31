@@ -11,29 +11,43 @@ const stringList = z.preprocess((value) => {
   }
 
   return [String(value)];
-}, z.array(z.string()).optional());
+}, z.array(z.string()).default([]));
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
-  schema: z
-    .object({
-      title: z.string(),
-      description: z.string().optional(),
-      date: z.coerce.date().optional(),
-      updated: z.coerce.date().optional(),
-      cover: z.string().optional(),
-      categories: stringList,
-      tags: stringList,
-      keywords: stringList,
-      ai: stringList,
-      sticky: z.coerce.number().optional(),
-      author: z.string().optional(),
-    })
-    .passthrough(),
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/posts',
+    // 支持"一篇一个文件夹"包结构：技术/deploy-static/index.md → id 为 技术/deploy-static
+    // 传统平铺写法也兼容：技术/deploy-static.md → id 为 技术/deploy-static
+    generateId: ({ entry }) => entry.replace(/\.md$/, '').replace(/\/index$/, ''),
+  }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string(),
+        description: z.string().optional(),
+        date: z.coerce.date().optional(),
+        updated: z.coerce.date().optional(),
+        // cover 支持本地图片（自动校验存在+构建时优化转WebP）和纯字符串外链
+        cover: z
+          .union([image(), z.string().url()])
+          .optional(),
+        categories: stringList,
+        tags: stringList,
+        keywords: stringList,
+        ai: stringList,
+        sticky: z.coerce.number().optional(),
+        author: z.string().optional(),
+      })
+      .passthrough(),
 });
 
 const notes = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/notes' }),
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/notes',
+    generateId: ({ entry }) => entry.replace(/\.md$/, '').replace(/\/index$/, ''),
+  }),
   schema: z
     .object({
       date: z.coerce.date(),

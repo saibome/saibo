@@ -18,7 +18,9 @@ const title = positional[0];
 const slugArg = positional[1];
 
 if (!title) {
-  console.error('用法: bun run new "文章标题" [slug] [--category=分类] [--tags=标签1,标签2] [--cover=图片地址]');
+  console.error('用法: bun run new "文章标题" [slug] [--category=分类] [--tags=标签1,标签2] [--cover=图片地址] [--flat]');
+  console.error('  默认：一篇一个文件夹 <slug>/index.md + 同级图片');
+  console.error('  --flat：平铺生成 <slug>.md（旧格式）');
   process.exit(1);
 }
 
@@ -54,11 +56,19 @@ function yamlList(items) {
 
 const slug = slugify(slugArg || title);
 const category = flags.category || '';
-const dir = category ? join('src', 'content', 'posts', category) : join('src', 'content', 'posts');
-const filePath = join(dir, `${slug}.md`);
+const flat = 'flat' in flags;
+const dir = category
+  ? join('src', 'content', 'posts', category, flat ? '' : slug)
+  : join('src', 'content', 'posts', flat ? '' : slug);
+const filePath = join(dir, flat ? `${slug}.md` : 'index.md');
 
-if (existsSync(filePath)) {
-  console.error(`文件已存在: ${filePath}`);
+// 文件夹模式下：检查目录（含其中任意 md 文件）和 slug 平铺 md 两种冲突
+const collision = flat
+  ? existsSync(filePath) || existsSync(join(dir, slug, 'index.md'))
+  : existsSync(filePath) || existsSync(join(category ? join('src','content','posts',category) : join('src','content','posts'), `${slug}.md`));
+
+if (collision) {
+  console.error(`文件已存在: ${filePath}（或对应旧/新格式同名文件）`);
   process.exit(1);
 }
 
