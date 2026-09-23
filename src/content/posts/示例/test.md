@@ -1,16 +1,21 @@
 ---
-title: "分类、标签与归档"
-description: "示例文章：介绍博客的分类页、标签页与归档页是如何自动生成的。"
-date: "2026-01-15"
+title: 分类、标签与归档
+description: 示例文章：介绍博客的分类页、标签页与归档页是如何自动生成的。
+date: 2026-01-15
 cover: https://image.laogou717.com/file/image/blog/2024/d4uvaLUq.jpg
-categories: 示例
+categories:
 tags:
   - 分类
   - 标签
 ---
+## 升级
 
-这个博客的分类、标签、归档页面全部在构建时自动生成，不需要手动维护。
+深咖啡色大健康数控刀具复刻就是斯蒂芬斯蒂芬
+![](sadsss.png)
 
+
+
+![](截屏2026-08-29%2014.34.10.png)
 ## 分类
 
 在 frontmatter 里写 `categories` 字段即可。一篇文章可以属于一个分类：

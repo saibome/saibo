@@ -10,8 +10,8 @@
     "note": "bun run scripts/new-note.mjs"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "7.2.4",
+    "@astrojs/markdown-remark": "7.3.1",
     "@phosphor-icons/core": "^2.1.1",
-    "astro": "7.2.9"
+    "astro": "7.3.4"
   }
 }

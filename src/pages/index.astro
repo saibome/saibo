@@ -8,6 +8,7 @@ import {
   getPostCategory,
   getPostCover,
   getPostDescription,
+  getPostPath,
   site,
   sortPosts,
   sortPostsByDate,
@@ -55,7 +56,7 @@ const coverHue = (value: string) => {
       <aside class="hero__picks" aria-label="精选文章">
         <p class="hero__picks-label">精选</p>
         <div class="picks">
-          <a class="pick-hero" href={`/posts/${heroPicks[0].id}/`}>
+          <a class="pick-hero" href={getPostPath(heroPicks[0])}>
             {getPostCover(heroPicks[0]) ? (
               <span class="pick-hero__thumb">
                 <img
@@ -88,7 +89,7 @@ const coverHue = (value: string) => {
             <ul class="pick-side">
               {heroPicks.slice(1, 5).map((post) => (
                 <li>
-                  <a class="pick-side__item" href={`/posts/${post.id}/`}>
+                  <a class="pick-side__item" href={getPostPath(post)}>
                     {getPostCover(post) ? (
                       <span class="pick-side__thumb">
                         <img src={getPostCover(post)} alt="" loading="lazy" referrerpolicy="no-referrer" />
@@ -124,7 +125,7 @@ const coverHue = (value: string) => {
         <h2>最新文章</h2>
         <p>持续更新 AI、开发和建站相关笔记。</p>
       </div>
-      <a class="section__more" href="/archive/">
+      <a class="section__more" href="/archive">
         全部 {posts.length} 篇
         <Icon name="arrow-right" size={16} />
       </a>

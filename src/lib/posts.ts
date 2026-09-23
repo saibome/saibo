@@ -77,7 +77,104 @@ export const getPostCover = (post: BlogPost): string | undefined => {
   return typeof c === 'string' ? c : c.src;
 };
 
-export const getPostPath = (post: BlogPost) => `/posts/${post.id}/`;
+// Post URL "slug" — short, flat, final segment shown at site root.
+// Priority:
+//   1. explicit frontmatter `slug:`  → user controls it exactly
+//   2. last path segment of post.id  → e.g. 技术/theme-switch → theme-switch
+// Note: post.id itself stays as the full "folder/subfolder/name" identity for
+// internal lookups (adjacent/related/slug-matching), only URLs go flat.
+export const getPostSlug = (post: BlogPost) => {
+  const explicit = post.data.slug?.trim();
+  if (explicit) return explicit;
+  const id = post.id;
+  const lastSlash = id.lastIndexOf('/');
+  return lastSlash === -1 ? id : id.slice(lastSlash + 1);
+};
+
+export const getPostPath = (post: BlogPost) => `/${getPostSlug(post)}`;
+
+// === 扁平 slug 安全检查 =====================================================
+//
+// 把扁平 URL 可能跟站内保留路径 / 其他文章 slug 撞上的情况，在 build 时
+// 用可读的错误信息提前报出来，避免作者在部署后才遇到静默 shadow 或
+// Astro 那串晦涩的 "duplicate params in getStaticPaths" 报错。
+//
+// 保留名规则：
+//   - /pages/*.astro / pages/*.ts 生成的顶层路由名（about / notes / …）
+//   - 动态子路由的目录名（categories / tags / posts），避免以后新增
+//     分类落地页 /categories 时和某文章 slug 打架
+//   - 顶层端点的输出文件名（rss.xml / sitemap.xml / robots.txt / search.json）
+//   - 常见保留名：favicon / api / admin / assets 这类未来可能要用的
+export const RESERVED_FLAT_SLUGS: ReadonlySet<string> = new Set([
+  // pages/*.astro 顶层静态页
+  'about',
+  'archive',
+  'notes',
+  'search',
+  '404',
+  // pages/ 下动态路由的目录名（保留命名空间）
+  'categories',
+  'tags',
+  'posts',
+  // pages/*.ts 端点的输出文件名
+  'rss.xml',
+  'sitemap.xml',
+  'robots.txt',
+  'search.json',
+  // 常见通用保留名
+  'favicon',
+  'api',
+  'admin',
+  'assets',
+  '_redirects',
+  'index',
+]);
+
+// 历史上删除过、但仍需要把旧 URL 重定向到某处的"遗留入口"。
+// 仅填：site.config 里仍在引用 / 或曾经对外发过外链的文章。
+// oldId  格式 = 旧 post.id（例如 技术/deploy-static）
+// newSlug 格式 = 新扁平 slug（不带 /），null 表示内容已删除，重定向到首页
+// title   用于错误/渲染信息
+export interface DeletedPostRedirect {
+  oldId: string;
+  newSlug: string | null;
+  title?: string;
+}
+
+export const DELETED_POST_REDIRECTS: readonly DeletedPostRedirect[] = [
+  // site.config.json projectGroups 还在引用 /deploy-static 作为文章链接，
+  // 虽然源文件已删除，保留旧路径到首页的软跳转，不让配置里的链接直接 404。
+  { oldId: '技术/deploy-static', newSlug: null, title: '静态站点部署实践' },
+];
+
+export const validatePostSlugs = (posts: BlogPost[]) => {
+  const bySlug = new Map<string, BlogPost[]>();
+  for (const post of posts) {
+    const slug = getPostSlug(post);
+    if (RESERVED_FLAT_SLUGS.has(slug)) {
+      throw new Error(
+        `[博客] slug 保留名冲突：\n  文章《${post.data.title}》 (id=${post.id})\n  最终 slug="${slug}" 与站内保留路径冲突。\n  保留名完整列表: ${[...RESERVED_FLAT_SLUGS].sort().join(', ')}\n\n请在 frontmatter 显式写一个不同的 slug: 字段，或修改文件名。`,
+      );
+    }
+    const arr = bySlug.get(slug) ?? [];
+    arr.push(post);
+    bySlug.set(slug, arr);
+  }
+  const collisions = [...bySlug.entries()].filter(([, arr]) => arr.length > 1);
+  if (collisions.length > 0) {
+    const details = collisions
+      .map(([slug, dupPosts]) => {
+        const list = dupPosts
+          .map((p) => `    · ${p.id}  《${p.data.title}》`)
+          .join('\n');
+        return `  · slug "${slug}" 被以下 ${dupPosts.length} 篇文章共用：\n${list}`;
+      })
+      .join('\n');
+    throw new Error(
+      `[博客] 发现 ${collisions.length} 组 slug 碰撞（多文章产生了同一个扁平 URL）：\n${details}\n请在 frontmatter 用显式 slug: 字段区分，或重命名冲突的 md 文件名。`,
+    );
+  }
+};
 
 export const absoluteUrl = (path: string) => new URL(path, site.url).toString();
 
@@ -157,10 +254,10 @@ export const getTags = (posts: BlogPost[]) =>
   mapToSortedTerms(countItems(posts.flatMap((post) => getPostTags(post))));
 
 export const getCategoryPath = (category: string) =>
-  `/categories/${encodeURIComponent(category)}/`;
+  `/categories/${encodeURIComponent(category)}`;
 
 export const getTagPath = (tag: string) =>
-  `/tags/${encodeURIComponent(tag)}/`;
+  `/tags/${encodeURIComponent(tag)}`;
 
 export const getPostsByCategory = (posts: BlogPost[], category: string) =>
   sortPosts(posts).filter((post) => post.data.categories?.includes(category));

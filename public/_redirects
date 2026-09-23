@@ -1,0 +1,36 @@
+# ===================================================================
+# 博客 URL 结构迁移：旧 /posts/分类/标题  → 新 /标题 扁平 URL
+#
+# 本文件被 Netlify / Vercel / Cloudflare Pages / Caddy on-demand 等
+# 静态托管平台原生读取，并直接返回 HTTP 301（永久重定向）。
+# 这比 pages/posts/[...slug].astro 的 meta-refresh 页面更利于 SEO 权重传递。
+#
+# 生成原则（和 posts/[...slug].astro 的 meta-refresh 页保持一致，双保险）：
+#   · 当前存在的文章：/posts/<id> 及 /posts/<id>/ → 301 → /<新 slug>
+#   · 历史已删文章（site.config 仍有外链）：/posts/<旧id> → 301 → 首页
+#
+# 当你新增/删除文章时，这里需要同步更新。可运行以下命令自动刷新：
+#   （后续如果需要全自动生成，可改走 astro.config 集成或 build 后脚本）
+# ===================================================================
+
+# --- 当前发布的文章：旧格式 URL → 新扁平 URL 永久 301 --------------
+# 文章：AI Agent 搭完整工作流
+/posts/26/06/260609-agent.blog      /260609-agent.blog  301
+/posts/26/06/260609-agent.blog/     /260609-agent.blog  301
+
+# 文章：主题切换脚本
+/posts/技术/theme-switch            /theme-switch        301
+/posts/技术/theme-switch/           /theme-switch        301
+
+# 文章：示例/test.md （新增草稿）
+/posts/示例/test                    /test                301
+/posts/示例/test/                   /test                301
+
+# 文章：AI/未命名 （新增草稿）
+/posts/AI/未命名                     /noname              301
+/posts/AI/未命名/                    /noname              301
+
+# --- 历史已删文章（仍可能被外部链接 / 搜索引擎引用） -----------------
+# 原文：静态站点部署实践 — site.config.json 仍在项目资源卡片中引用
+/posts/技术/deploy-static           /                    301
+/posts/技术/deploy-static/          /                    301

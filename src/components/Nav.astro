@@ -1,13 +1,14 @@
 ---
 import Icon from './Icon.astro';
 
-// Trailing slashes matter: hosts 301 `/archive` → `/archive/`, and a redirect
-// makes the browser skip the cross-document view transition.
-const pathname = Astro.url.pathname.endsWith('/')
-  ? Astro.url.pathname
-  : `${Astro.url.pathname}/`;
+// Compare against the clean pathname. Dev server may redirect `/archive/` to
+// `/archive` (or vice versa depending on host); use the normalized form so
+// nav "current" highlighting works regardless of trailing slashes.
+const pathname = Astro.url.pathname === '/'
+  ? '/'
+  : Astro.url.pathname.replace(/\/+$/, '');
 const isCurrent = (href: string) =>
-  href === '/' ? pathname === '/' : pathname.startsWith(href);
+  href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 ---
 
 <header
@@ -18,12 +19,13 @@ const isCurrent = (href: string) =>
   <nav class="site-nav__pill" aria-label="主导航">
     <span class="site-nav__indicator" aria-hidden="true"></span>
     <a href="/" class:list={[isCurrent('/') && 'is-current']} data-nav-route>首页</a>
-    <a href="/notes/" class:list={[isCurrent('/notes/') && 'is-current']} data-nav-route>随笔</a>
-    <a href="/archive/" class:list={[isCurrent('/archive/') && 'is-current']} data-nav-route>归档</a>
-    <a href="/about/" class:list={[isCurrent('/about/') && 'is-current']} data-nav-route>关于</a>
+    <a href="/notes" class:list={[isCurrent('/notes') && 'is-current']} data-nav-route>随笔</a>
+    <a href="/archive" class:list={[isCurrent('/archive') && 'is-current']} data-nav-route>归档</a>
+    <a href="/about" class:list={[isCurrent('/about') && 'is-current']} data-nav-route>关于</a>
     <span class="site-nav__sep" aria-hidden="true"></span>
-    <a href="/search/"
-      class:list={['site-nav__icon', isCurrent('/search/') && 'is-current']}
+    <a href="/search"
+      class:list={['site-nav__icon', isCurrent('/search') && 'is-current']}
+      data-nav-route
       aria-label="搜索"
       aria-keyshortcuts="/ Meta+K"
       title="搜索（/ 或 ⌘K）"
@@ -53,9 +55,15 @@ const isCurrent = (href: string) =>
     initialized: false,
   };
 
+  // Match the server-side normalization: always strip ALL trailing slashes so
+  // that href="/archive" on the template lines up with window.location.pathname
+  // no matter whether the browser reports "/archive", "/archive/", or even
+  // "/archive///". Uses the exact same regex as Astro.url.pathname on the
+  // server so SSR/client parity is trivially provable.
   const normalizePath = (value: string) => {
-    const path = value.endsWith('/') ? value : `${value}/`;
-    return path === '//' ? '/' : path;
+    if (value === '/') return '/';
+    const stripped = value.replace(/\/+$/, '');
+    return stripped.length === 0 ? '/' : stripped;
   };
 
   const readIndicatorState = (indicator: HTMLElement, pill: HTMLElement): IndicatorState => {
@@ -159,7 +167,11 @@ const isCurrent = (href: string) =>
     const pathname = normalizePath(window.location.pathname);
     document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href]').forEach((link) => {
       const href = normalizePath(new URL(link.href, window.location.href).pathname);
-      const current = href === '/' ? pathname === '/' : pathname.startsWith(href);
+      // Mirror server-side isCurrent: exact match OR this nav item is a parent
+      // of the current page (e.g. a hypothetical /notes/2024 keeps 随笔 active).
+      const current = href === '/'
+        ? pathname === '/'
+        : pathname === href || pathname.startsWith(`${href}/`);
       link.classList.remove('is-pending');
       link.classList.toggle('is-current', current);
       if (current) link.setAttribute('aria-current', 'page');

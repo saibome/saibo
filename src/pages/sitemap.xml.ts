@@ -29,7 +29,7 @@ export async function GET() {
   const categories = getCategories(posts);
   const tags = getTags(posts);
 
-  const staticPaths = ['/', '/search/', '/archive/', '/notes/', '/about/'];
+  const staticPaths = ['/', '/search', '/archive', '/notes', '/about'];
   const paths = [
     ...staticPaths.map((path) => urlEntry(path)),
     ...posts.map((post) => urlEntry(getPostPath(post), getPostUpdatedDate(post))),

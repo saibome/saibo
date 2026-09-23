@@ -19,3 +19,8 @@ yarn-error.log*
 bun-debug.log*
 .DS_Store
 .workbuddy/
+
+# Obsidian: keep workflow settings (app.json, core-plugins.json),
+# ignore personal view state that changes on every open
+src/content/.obsidian/workspace.json
+src/content/.obsidian/workspace-mobile.json

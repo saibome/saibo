@@ -26,6 +26,19 @@ const posts = defineCollection({
       .object({
         title: z.string(),
         description: z.string().optional(),
+        // 显式 slug 优先于文件名推导：
+        //   - 写了 slug: hello → 最终访问路径 /hello
+        //   - 没写 → 取 post.id 最后一段（去掉子目录，如 技术/theme-switch → theme-switch）
+        // 允许字符：ASCII 字母/数字、中文、连字符、下划线、点（兼容 260609-agent.blog 这种 ID 末段）
+        // 明确禁止：/ \ 空格 ? # % & @ = + , ; : 反引号 尖括号 以及控制字符
+        slug: z
+          .string()
+          .trim()
+          .regex(
+            /^[A-Za-z0-9\u4e00-\u9fff._-]+$/,
+            'slug 仅允许中英文、数字、连字符(-)、下划线(_)和点(.)；不可含斜杠/空格/?/#等',
+          )
+          .optional(),
         date: z.coerce.date().optional(),
         updated: z.coerce.date().optional(),
         // cover 三种写法均支持（按顺序匹配，string 在前避免 image() 误解析路径）：
